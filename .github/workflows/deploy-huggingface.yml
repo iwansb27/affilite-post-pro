@@ -20,7 +20,7 @@ jobs:
       - name: Install Hugging Face Hub CLI
         run: python -m pip install --upgrade huggingface_hub
 
-      - name: Deploy repository to Hugging Face Space
+      - name: Create or verify Hugging Face Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_SPACE_REPO: iwansb27/huggingface-deploy-bridge-gpt
@@ -29,6 +29,13 @@ jobs:
             echo "HF_TOKEN secret is not configured in GitHub."
             exit 1
           fi
+          hf repo create "$HF_SPACE_REPO" --repo-type space --exist-ok --token "$HF_TOKEN"
+
+      - name: Deploy repository to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE_REPO: iwansb27/huggingface-deploy-bridge-gpt
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote add huggingface "https://iwansb27:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_REPO}.git"
